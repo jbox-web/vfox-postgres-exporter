@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#MISE description="Run plugin tests - install and execute tool"
+set -euo pipefail
+
+mise plugin link --force postgres-exporter .
+mise cache clear
+mise install postgres-exporter@0.19.1
+
+# Capture and display the output while also verifying it
+output=$(mise exec "postgres-exporter@0.19.1" -- "postgres_exporter" --version 2>&1)
+echo "postgres-exporter output: ${output}"
+
+if echo "${output}" | grep -q '0.19.1'; then
+  echo "✓ Tests passed"
+else
+  echo "✗ Test failed: expected version postgres-exporter@0.19.1"
+  exit 1
+fi
